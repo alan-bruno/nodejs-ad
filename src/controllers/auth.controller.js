@@ -1,30 +1,32 @@
-/**
- * Arquivo: src/controllers/auth.controller
- * Descrição: arquivo responsável pela lógica de autenticação e usuários da API
- * Data: 05/03/2021
- * Autor: Leticia Machado
- */
- const ad = require("../config/activeDirectory");
- 
- //Método para autenticar usuários
- exports.user_authenticate = async (req, res) => {
-   const { user, pass, domain } = req.body;
-   try {
-     await ad.authenticate( domain + "\\" + user, pass,
+const ad = require("../config/activeDirectory");
+const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
+
+dotenv.config();
+//Método para autenticar usuários
+exports.user_authenticate = async (req, res) => {
+  const { username, password } = req.body;
+  const token = jwt.sign({ username: username }, process.env.HASH, { expiresIn: '1m' });
+  try {
+    await ad.authenticate(username + "@" + process.env.DOMAIN_CONTROLLER, password,
       function (err, auth) {
+
         if (auth) {
           return res.status(200).json({
-                message: "Authenticated!"
-              });
-          }
+            validation: auth,
+            accessToken: token,
+            message: "Authenticated!",
+          });
+        }
         else {
           return res.status(401).send({
-              message: "Authentication failed!",
-              error: err
+            accessToken: auth,
+            message: "Authentication failed!",
+            error: err
           });
-       }
+        }
       });
-    }catch (err) {
+  } catch (err) {
     return res.status(500).send({ message: "ERROR " + err });
-   }
- };
+  }
+};

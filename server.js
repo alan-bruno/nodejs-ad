@@ -5,9 +5,9 @@
  * Autor: Leticia Machado
  */
 
- const app = require('./src/app');
- const port = process.env.PORT || 3000;
+const app = require('./src/app');
+const port = process.env.PORT || 3001;
 
- app.listen(port, () => {
-     console.log("Success! Port: ", port);
- })
+app.listen(port, () => {
+    console.log("Success! Port: ", port);
+})
